@@ -19,17 +19,27 @@ function pathExists(path) {
 
 module.exports = function fixFacebookPluginAndroidSupport(context) {
 
-  console.log( JSON.stringify(context) );
+//  console.log( JSON.stringify(context) );
 
   console.log("Fixing FacebookLib Android support.");
 
+  // library files directory name is prefixed w/ the last component of the application identifier
+  // => we have to parse config.xml to determine it
+  var et = context.requireCordovaModule('elementtree');
+  var configPath = path.join(context.opts.projectRoot, 'config.xml');
+  var configContents = fs.readFileSync(configPath, { encoding: 'utf8' });
+  var config = et.parse( configContents );
+  var applicationId = config.getroot().get('id');
+  var lastDotIndex = applicationId.lastIndexOf('.');
+  var startIndex = lastDotIndex >= 0 ? lastDotIndex + 1 : 0;
+  var directoryPrefix = applicationId.substring( startIndex, applicationId.length );
+
   var androidPlatformDir = path.join(context.opts.projectRoot, 'platforms', 'android' );
-  var facebookLibDir = path.join( androidPlatformDir, 'com.phonegap.plugins.facebookconnect', 'ui-FacebookLib' );
+  var facebookLibDir = path.join( androidPlatformDir, 'com.phonegap.plugins.facebookconnect', directoryPrefix + '-FacebookLib' );
 
   console.log("Deleting Android support JAR file from libs directory.");
   var facebookLibLibrariesDir = path.join( facebookLibDir, 'libs' );
   var androidSupportPath = path.join( facebookLibLibrariesDir, 'android-support-v4.jar' );
-
   if ( pathExists( androidSupportPath ) ) {
     fs.unlinkSync( androidSupportPath );
     console.info("Removed '%s'.", androidSupportPath );
