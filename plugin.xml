@@ -1,0 +1,7 @@
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" id="phonegap-facebook-fix-android-support-plugin" version="0.9.0">
+  <name>phonegap-facebook-fix-android-support-plugin</name>
+  <keywords>cordova,android,versioncode</keywords>
+  <platform name="android">
+    <hook type="before_compile" src="scripts/android/fixFacebookPluginAndroidSupport.js"/>
+  </platform>
+</plugin>
